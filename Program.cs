@@ -7,78 +7,171 @@ namespace utf8fuzz
 {
     class Program
     {
-        private class JsonFuzzerException : Exception
+        private static void TestNumberTryGetMethods(Utf8JsonReader reader)
         {
-            public JsonFuzzerException(string message) : base(message) { }
-        }
+            string valueAsStr = Encoding.UTF8.GetString(reader.ValueSpan);
 
-        private static void TestNumberTryGetMethods(byte[] jsonPayload)
-        {
-            Utf8JsonReader reader = new Utf8JsonReader(jsonPayload);
-
-            while (reader.Read())
+            if (!reader.TryGetByte(out _))
             {
-                if (reader.TokenType == JsonTokenType.Number)
-                {
-                    if (!reader.TryGetByte(out _))
-                    {
-                        throw new JsonFuzzerException($"Failed to parse as Byte: {Encoding.UTF8.GetString(reader.ValueSpan)}");
-                    }
+                Console.WriteLine($"Failed to parse as Byte: {valueAsStr}");
+            }
 
-                    if (!reader.TryGetSByte(out _))
-                    {
-                        throw new JsonFuzzerException($"Failed to parse as SByte: {Encoding.UTF8.GetString(reader.ValueSpan)}");
-                    }
+            if (!reader.TryGetSByte(out _))
+            {
+                Console.WriteLine($"Failed to parse as SByte: {valueAsStr}");
+            }
 
-                    if (!reader.TryGetInt16(out _))
-                    {
-                        throw new JsonFuzzerException($"Failed to parse as Int16: {Encoding.UTF8.GetString(reader.ValueSpan)}");
-                    }
+            if (!reader.TryGetInt16(out _))
+            {
+                Console.WriteLine($"Failed to parse as Int16: {valueAsStr}");
+            }
 
-                    if (!reader.TryGetInt32(out _))
-                    {
-                        throw new JsonFuzzerException($"Failed to parse as Int32: {Encoding.UTF8.GetString(reader.ValueSpan)}");
-                    }
+            if (!reader.TryGetInt32(out _))
+            {
+                Console.WriteLine($"Failed to parse as Int32: {valueAsStr}");
+            }
 
-                    if (!reader.TryGetInt64(out _))
-                    {
-                        throw new JsonFuzzerException($"Failed to parse as Int64: {Encoding.UTF8.GetString(reader.ValueSpan)}");
-                    }
+            if (!reader.TryGetInt64(out _))
+            {
+                Console.WriteLine($"Failed to parse as Int64: {valueAsStr}");
+            }
 
-                    if (!reader.TryGetUInt16(out _))
-                    {
-                        throw new JsonFuzzerException($"Failed to parse as UInt16: {Encoding.UTF8.GetString(reader.ValueSpan)}");
-                    }
+            if (!reader.TryGetUInt16(out _))
+            {
+                Console.WriteLine($"Failed to parse as UInt16: {valueAsStr}");
+            }
 
-                    if (!reader.TryGetUInt32(out _))
-                    {
-                        throw new JsonFuzzerException($"Failed to parse as UInt32: {Encoding.UTF8.GetString(reader.ValueSpan)}");
-                    }
+            if (!reader.TryGetUInt32(out _))
+            {
+                Console.WriteLine($"Failed to parse as UInt32: {valueAsStr}");
+            }
 
-                    if (!reader.TryGetUInt64(out _))
-                    {
-                        throw new JsonFuzzerException($"Failed to parse as UInt64: {Encoding.UTF8.GetString(reader.ValueSpan)}");
-                    }
+            if (!reader.TryGetUInt64(out _))
+            {
+                Console.WriteLine($"Failed to parse as UInt64: {valueAsStr}");
+            }
 
-                    if (!reader.TryGetSingle(out _))
-                    {
-                        throw new JsonFuzzerException($"Failed to parse as Single: {Encoding.UTF8.GetString(reader.ValueSpan)}");
-                    }
+            if (!reader.TryGetSingle(out _))
+            {
+                Console.WriteLine($"Failed to parse as Single: {valueAsStr}");
+            }
 
-                    if (!reader.TryGetDouble(out _))
-                    {
-                        throw new JsonFuzzerException($"Failed to parse as Double: {Encoding.UTF8.GetString(reader.ValueSpan)}");
-                    }
+            if (!reader.TryGetDouble(out _))
+            {
+                Console.WriteLine($"Failed to parse as Double: {valueAsStr}");
+            }
 
-                    if (!reader.TryGetDecimal(out _))
-                    {
-                        throw new JsonFuzzerException($"Failed to parse as Decimal: {Encoding.UTF8.GetString(reader.ValueSpan)}");
-                    }
-                }
+            if (!reader.TryGetDecimal(out _))
+            {
+                Console.WriteLine($"Failed to parse as Decimal: {valueAsStr}");
             }
         }
 
-        private static void TestNumberGetMethods(byte[] jsonPayload)
+        private static void TestNumberGetMethods(Utf8JsonReader reader)
+        {
+            string valueAsStr = Encoding.UTF8.GetString(reader.ValueSpan);
+
+            try
+            {
+                reader.TryGetByte(out _);
+            }
+            catch (FormatException)
+            {
+                Console.WriteLine($"Failed to parse as Byte: {valueAsStr}");
+            }
+
+            try
+            {
+                reader.TryGetSByte(out _);
+            }
+            catch (FormatException)
+            {
+                Console.WriteLine($"Failed to parse as SByte: {valueAsStr}");
+            }
+
+            try
+            {
+                reader.TryGetInt16(out _);
+            }
+            catch (FormatException)
+            {
+                Console.WriteLine($"Failed to parse as Int16: {valueAsStr}");
+            }
+
+            try
+            {
+                reader.TryGetInt32(out _);
+            }
+            catch (FormatException)
+            {
+                Console.WriteLine($"Failed to parse as Int32: {valueAsStr}");
+            }
+
+            try
+            {
+                reader.TryGetInt64(out _);
+            }
+            catch (FormatException)
+            {
+                Console.WriteLine($"Failed to parse as Int64: {valueAsStr}");
+            }
+
+            try
+            {
+                reader.TryGetUInt16(out _);
+            }
+            catch (FormatException)
+            {
+                Console.WriteLine($"Failed to parse as UInt16: {valueAsStr}");
+            }
+
+            try
+            {
+                reader.TryGetUInt32(out _);
+            }
+            catch (FormatException)
+            {
+                Console.WriteLine($"Failed to parse as UInt32: {valueAsStr}");
+            }
+
+            try
+            {
+                reader.TryGetUInt64(out _);
+            }
+            catch (FormatException)
+            {
+                Console.WriteLine($"Failed to parse as UInt64: {valueAsStr}");
+            }
+
+            try
+            {
+                reader.TryGetSingle(out _);
+            }
+            catch (FormatException)
+            {
+                Console.WriteLine($"Failed to parse as Single: {valueAsStr}");
+            }
+
+            try
+            {
+                reader.TryGetDouble(out _);
+            }
+            catch (FormatException)
+            {
+                Console.WriteLine($"Failed to parse as Double: {valueAsStr}");
+            }
+
+            try
+            {
+                reader.TryGetDecimal(out _);
+            }
+            catch (FormatException)
+            {
+                Console.WriteLine($"Failed to parse as Decimal: {valueAsStr}");
+            }
+        }
+
+        private static void RunTests(byte[] jsonPayload)
         {
             Utf8JsonReader reader = new Utf8JsonReader(jsonPayload);
 
@@ -86,17 +179,8 @@ namespace utf8fuzz
             {
                 if (reader.TokenType == JsonTokenType.Number)
                 {
-                    reader.GetByte();
-                    reader.GetSByte();
-                    reader.GetInt16();
-                    reader.GetInt32();
-                    reader.GetInt64();
-                    reader.GetUInt16();
-                    reader.GetUInt32();
-                    reader.GetUInt64();
-                    reader.GetSingle();
-                    reader.GetDouble();
-                    reader.GetDecimal();
+                    TestNumberGetMethods(reader);
+                    TestNumberTryGetMethods(reader);
                 }
             }
         }
@@ -116,11 +200,7 @@ namespace utf8fuzz
                 Console.WriteLine($"({allBytes.Length} bytes remain)");
             }
 
-            Console.WriteLine("Fuzzing Number TryGet methods");
-            TestNumberTryGetMethods(allBytes);
-
-            Console.WriteLine("Fuzzing Number Get methods");
-            TestNumberGetMethods(allBytes);
+            RunTests(allBytes);
         }
     }
 }
