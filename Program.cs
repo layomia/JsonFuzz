@@ -9,6 +9,8 @@ namespace utf8fuzz
     {
         private static void TestNumberTryGetMethods(Utf8JsonReader reader)
         {
+            Console.WriteLine("Running TryGetNumber tests.");
+
             string valueAsStr = Encoding.UTF8.GetString(reader.ValueSpan);
 
             if (!reader.TryGetByte(out _))
@@ -69,6 +71,7 @@ namespace utf8fuzz
 
         private static void TestNumberGetMethods(Utf8JsonReader reader)
         {
+            Console.WriteLine("Running GetNumber tests.");
             string valueAsStr = Encoding.UTF8.GetString(reader.ValueSpan);
 
             try
