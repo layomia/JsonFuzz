@@ -76,7 +76,7 @@ namespace utf8fuzz
 
             try
             {
-                reader.TryGetByte(out _);
+                reader.GetByte();
             }
             catch (FormatException)
             {
@@ -85,7 +85,7 @@ namespace utf8fuzz
 
             try
             {
-                reader.TryGetSByte(out _);
+                reader.GetSByte();
             }
             catch (FormatException)
             {
@@ -94,7 +94,7 @@ namespace utf8fuzz
 
             try
             {
-                reader.TryGetInt16(out _);
+                reader.GetInt16();
             }
             catch (FormatException)
             {
@@ -103,7 +103,7 @@ namespace utf8fuzz
 
             try
             {
-                reader.TryGetInt32(out _);
+                reader.GetInt32();
             }
             catch (FormatException)
             {
@@ -112,7 +112,7 @@ namespace utf8fuzz
 
             try
             {
-                reader.TryGetInt64(out _);
+                reader.GetInt64();
             }
             catch (FormatException)
             {
@@ -121,7 +121,7 @@ namespace utf8fuzz
 
             try
             {
-                reader.TryGetUInt16(out _);
+                reader.GetUInt16();
             }
             catch (FormatException)
             {
@@ -130,7 +130,7 @@ namespace utf8fuzz
 
             try
             {
-                reader.TryGetUInt32(out _);
+                reader.GetUInt32();
             }
             catch (FormatException)
             {
@@ -139,7 +139,7 @@ namespace utf8fuzz
 
             try
             {
-                reader.TryGetUInt64(out _);
+                reader.GetUInt64();
             }
             catch (FormatException)
             {
@@ -148,7 +148,7 @@ namespace utf8fuzz
 
             try
             {
-                reader.TryGetSingle(out _);
+                reader.GetSingle();
             }
             catch (FormatException)
             {
@@ -157,7 +157,7 @@ namespace utf8fuzz
 
             try
             {
-                reader.TryGetDouble(out _);
+                reader.GetDouble();
             }
             catch (FormatException)
             {
@@ -166,7 +166,7 @@ namespace utf8fuzz
 
             try
             {
-                reader.TryGetDecimal(out _);
+                reader.GetDecimal();
             }
             catch (FormatException)
             {
@@ -174,18 +174,178 @@ namespace utf8fuzz
             }
         }
 
-        private static void RunTests(byte[] jsonPayload)
+        private static void TestStringTryGetMethods(Utf8JsonReader reader)
         {
+            Console.WriteLine("Running string TryGet tests.");
+            string valueAsStr = Encoding.UTF8.GetString(reader.ValueSpan);
+
+            if (!reader.TryGetDateTime(out _))
+            {
+                Console.WriteLine($"Failed to parse as DateTime: {valueAsStr}");
+            }
+
+            if (!reader.TryGetDateTimeOffset(out _))
+            {
+                Console.WriteLine($"Failed to parse as DateTimeOffset: {valueAsStr}");
+            }
+
+            if (!reader.TryGetGuid(out _))
+            {
+                Console.WriteLine($"Failed to parse as Guid: {valueAsStr}");
+            }
+        }
+
+        private static void TestStringGetMethods(Utf8JsonReader reader)
+        {
+            Console.WriteLine("Running string Get tests.");
+            string valueAsStr = Encoding.UTF8.GetString(reader.ValueSpan);
+
+            reader.GetString();
+
+            try
+            {
+                reader.GetDateTime();
+            }
+            catch (FormatException)
+            {
+                Console.WriteLine($"Failed to parse as DateTime: {valueAsStr}");
+            }
+
+            try
+            {
+                reader.GetDateTimeOffset();
+            }
+            catch (FormatException)
+            {
+                Console.WriteLine($"Failed to parse as DateTimeOffset: {valueAsStr}");
+            }
+
+            try
+            {
+                reader.GetGuid();
+            }
+            catch (FormatException)
+            {
+                Console.WriteLine($"Failed to parse as DateTimeOffset: {valueAsStr}");
+            }
+        }
+
+        private static void TestCommentGetMethods(Utf8JsonReader reader)
+        {
+            Console.WriteLine("Running comment Get tests.");
+            reader.GetComment();
+        }
+
+        private static void TestBooleanGetMethods(Utf8JsonReader reader)
+        {
+            Console.WriteLine("Running boolean Get tests.");
+            reader.GetBoolean();
+        }
+
+        private static void TestReaderMethods(byte[] jsonPayload)
+        {
+            Console.WriteLine("Testing reader methods without using token type.");
+            Utf8JsonReader reader = new Utf8JsonReader(jsonPayload);
+
+            try
+            {
+                while (reader.Read())
+                {
+                    TestCommentGetMethods(reader);
+                    TestBooleanGetMethods(reader);
+                    TestNumberGetMethods(reader);
+                    TestNumberTryGetMethods(reader);
+                    TestNumberGetMethods(reader);
+                    TestNumberTryGetMethods(reader);
+                    TestStringGetMethods(reader);
+                    TestStringTryGetMethods(reader);
+                }
+            }
+            catch (JsonException e)
+            {
+                Console.WriteLine(e.Message);
+            }
+            catch (FormatException e)
+            {
+                Console.WriteLine(e.Message);
+            }
+            catch (InvalidOperationException e)
+            {
+                Console.WriteLine(e.Message);
+            }
+        }
+
+        private static void TestReaderMethodsUsingTokenType(byte[] jsonPayload)
+        {
+            Console.WriteLine("Testing reader methods using token type.");
             Utf8JsonReader reader = new Utf8JsonReader(jsonPayload);
 
             while (reader.Read())
             {
-                if (reader.TokenType == JsonTokenType.Number)
+                switch (reader.TokenType)
                 {
-                    TestNumberGetMethods(reader);
-                    TestNumberTryGetMethods(reader);
+                    case JsonTokenType.Comment:
+                        TestCommentGetMethods(reader);
+                        break;
+                    case JsonTokenType.False:
+                    case JsonTokenType.True:
+                        TestBooleanGetMethods(reader);
+                        break;
+                    case JsonTokenType.Null:
+                        TestNumberGetMethods(reader);
+                        TestNumberTryGetMethods(reader);
+                        break;
+                    case JsonTokenType.Number:
+                        TestNumberGetMethods(reader);
+                        TestNumberTryGetMethods(reader);
+                        break;
+                    case JsonTokenType.String:
+                        TestStringGetMethods(reader);
+                        TestStringTryGetMethods(reader);
+                        break;
+                    case JsonTokenType.PropertyName:
+                        reader.GetString();
+                        break;
+                    default:
+                        break;
                 }
             }
+        }
+
+        private static void TestReadAll(byte[] jsonPayload)
+        {
+            Utf8JsonReader reader = new Utf8JsonReader(jsonPayload);
+
+            Console.WriteLine("Testing read all.");
+            try
+            {
+                while (reader.Read()) { }
+            }
+            catch(JsonException e)
+            {
+                Console.WriteLine(e.Message);
+            }
+        }
+
+        private static void TestSerializer(byte[] jsonPayload)
+        {
+            try
+            {
+                object obj = JsonSerializer.Deserialize<object>(jsonPayload);
+            }
+            catch (ArgumentNullException) { }
+            catch (JsonException e)
+            {
+                Console.WriteLine(e.Message);
+            }
+        }
+
+        private static void RunTests(byte[] jsonPayload)
+        {
+            TestReadAll(jsonPayload);
+            TestReaderMethods(jsonPayload);
+            TestReaderMethodsUsingTokenType(jsonPayload);
+            TestSerializer(jsonPayload);
         }
 
         static void Main(string[] args)
