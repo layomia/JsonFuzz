@@ -1,0 +1,1 @@
+[ "stringValue", true, /* Comment within */ 1234, null] // Comment outside
